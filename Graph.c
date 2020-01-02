@@ -77,7 +77,7 @@ void freeGraph(Graph* pG) {
 
 // private functions -----------------------------------------------
 
-void visit(Graph G, List S, int x) {
+void visit(Graph G, Graph F, double[] A, List S, int x) {
     G->discover[x] = (++time);
     G->color[x] = GRAY;
 
@@ -85,6 +85,7 @@ void visit(Graph G, List S, int x) {
     while (index(G->adj[x]) >= 0) {
         if (G->color[get(G->adj[x])] == WHITE) {
             G->parent[get(G->adj[x])] = x;
+            addArc(F, A, x, get(G->adj[x]));
             // printf("Vertex %d has parent %d\n", get(G->adj[x]), x);
             visit(G, S, get(G->adj[x]));
         }
@@ -199,7 +200,7 @@ void addArc(Graph G, double[] A, int u, int v) {
 //     G->size--;
 // }
 
-void DFS(Graph G, List S) {
+void DFS(Graph G, double[] A, List S) {
     if (G == NULL) {
         printf("Graph Error: calling DFS() on NULL Graph reference.\n");
         exit(1);
@@ -208,6 +209,8 @@ void DFS(Graph G, List S) {
         printf("Graph Error: calling DFS() on incorrect vertex ordering.\n");
         exit(1);
     }
+
+    Graph F = newGraph(getOrder(G));
 
     for (int i = 1; i <= getOrder(G); i++) {
         G->color[i] = WHITE;
@@ -221,10 +224,13 @@ void DFS(Graph G, List S) {
     moveFront(S);
     while (index(S) >= 0) {
         if (G->color[get(S)] == WHITE) {
-            visit(G, L, get(S));
+            visit(G, F, A, L, get(S));
         }
         moveNext(S);
     }
+
+    freeGraph(&G);
+    G = copyGraph(F);
 
     clear(S);
     moveFront(L);
@@ -232,7 +238,6 @@ void DFS(Graph G, List S) {
         append(S, get(L));
         moveNext(L);
     }
-
 
     freeList(&L);
 }
