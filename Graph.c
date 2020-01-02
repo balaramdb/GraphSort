@@ -77,7 +77,7 @@ void freeGraph(Graph* pG) {
 
 // private functions -----------------------------------------------
 
-void visit(Graph G, Graph F, double[] A, List S, int x) {
+void visit(Graph G, Graph F, double A[], List S, int x) {
     G->discover[x] = (++time);
     G->color[x] = GRAY;
 
