@@ -159,7 +159,7 @@ int getFinish(Graph G, int u) {
 
 // manipulation procedures ------------------------------------------
 
-void addArc(Graph G, int u, int v) {
+void addArc(Graph G, double[] A, int u, int v) {
     if (G == NULL) {
         printf("Graph Error: calling addArc() on NULL Graph reference.\n");
         exit(1);
@@ -171,7 +171,7 @@ void addArc(Graph G, int u, int v) {
 
     moveFront(G->adj[u]);
     while (index(G->adj[u]) >= 0) {
-        if (v < get(G->adj[u])) {
+        if (A[v] < A[get(G->adj[u])]) {
             insertBefore(G->adj[u], v);
             break;
         }
@@ -184,20 +184,20 @@ void addArc(Graph G, int u, int v) {
     G->size++;
 }
 
-void addEdge(Graph G, int u, int v) {
-    if (G == NULL) {
-        printf("Graph Error: calling addEdge() on NULL Graph reference.\n");
-        exit(1);
-    }
-    if (u < 1 || u > getOrder(G) || v < 1 || v > getOrder(G)) {
-        printf("Graph Error: calling addEdge() on incorrect vertex label(s).\n");
-        exit(1);
-    }
-
-    addArc(G, u, v);
-    addArc(G, v, u);
-    G->size--;
-}
+// void addEdge(Graph G, int u, int v) {
+//     if (G == NULL) {
+//         printf("Graph Error: calling addEdge() on NULL Graph reference.\n");
+//         exit(1);
+//     }
+//     if (u < 1 || u > getOrder(G) || v < 1 || v > getOrder(G)) {
+//         printf("Graph Error: calling addEdge() on incorrect vertex label(s).\n");
+//         exit(1);
+//     }
+//
+//     addArc(G, u, v);
+//     addArc(G, v, u);
+//     G->size--;
+// }
 
 void DFS(Graph G, List S) {
     if (G == NULL) {
