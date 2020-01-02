@@ -160,7 +160,7 @@ int getFinish(Graph G, int u) {
 
 // manipulation procedures ------------------------------------------
 
-void addArc(Graph G, double[] A, int u, int v) {
+void addArc(Graph G, double A[], int u, int v) {
     if (G == NULL) {
         printf("Graph Error: calling addArc() on NULL Graph reference.\n");
         exit(1);
@@ -200,7 +200,7 @@ void addArc(Graph G, double[] A, int u, int v) {
 //     G->size--;
 // }
 
-void DFS(Graph G, double[] A, List S) {
+void DFS(Graph G, double A[], List S) {
     if (G == NULL) {
         printf("Graph Error: calling DFS() on NULL Graph reference.\n");
         exit(1);
