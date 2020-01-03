@@ -118,6 +118,19 @@ int getSize(Graph G) {
     return G->size;
 }
 
+List getAdj(Graph G, int u) {
+    if (G == NULL) {
+        printf("Graph Error: calling getAdj() on NULL Graph reference.\n");
+        exit(1);
+    }
+    if (u < 1 || u > getOrder(G)) {
+        printf("Graph Error: calling getAdj() on incorrect vertex label.\n");
+        exit(1);
+    }
+
+    return G->adj[u];
+}
+
 int getParent(Graph G, int u) {
     if (G == NULL) {
         printf("Graph Error: calling getParent() on NULL Graph reference.\n");

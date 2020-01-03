@@ -32,6 +32,7 @@ void freeGraph(Graph* pG);
 /* Access functions */
 int getOrder(Graph G);
 int getSize(Graph G);
+List getAdj(Graph G, int u);
 int getParent(Graph G, int u); /* Pre: 1<=u<=n=getOrder(G) */
 int getDiscover(Graph G, int u); /* Pre: 1<=u<=n=getOrder(G) */
 int getFinish(Graph G, int u); /* Pre: 1<=u<=n=getOrder(G) */
