@@ -23,11 +23,56 @@ Graph makeGraph(double A[], int n) {
 }
 
 void mergeTrees(Graph G, double A[], int x, int y) {
-
+    int u = x;
+    int v = y;
+    while (u != NIL && v != NIL) {
+        if (A[u] < A[v]) {
+            addArc(G, A, u, v);
+            List L = getAdj(G, u);
+            if (length(L) > 0) {
+                u = front(L);
+            } else {
+                u = NIL;
+            }
+            freeList(&L);
+        } else if (A[u] > A[v]) {
+            addArc(G, A, v, u);
+            List L = getAdj(G, v);
+            if (length(L) > 0) {
+                v = front(L);
+            } else {
+                v = NIL;
+            }
+            freeList(&L);
+        }
+    }
 }
 
-int merge(Graph G, double A[]) {
+int merge(Graph G, double A[], int n) {
+    List roots = newList();
+    for (int x = 1; x <= n; x++) {
+        if (getParent(G, x) == NIL) {
+            append(roots, x);
+            List L = getAdj(G, x);
+            if (length(L) > 0) {
+                int l = front(L);
+                int r = back(L);
+                mergeTrees(G, A, l, r);
+            }
+            freeList(&L);
+        }
+    }
 
+    moveFront(roots);
+    while (index(roots) >= 0 && index(roots) < length(roots) - 2) {
+        int r = get(roots);
+        moveNext(roots);
+        int s = get(roots);
+        moveNext(roots);
+        mergeTrees(G, A, r, s);
+    }
+
+    return (int) (length(roots) / 2);
 }
 
 double* graphSort(double A[], int n) {
@@ -65,7 +110,7 @@ double* graphSort(double A[], int n) {
     while (trees > 1) {
         List S = copyList(L);
         DFS(G, A, S);
-        trees = merge(G, A);
+        trees = merge(G, A, n);
         freeList(&S);
     }
     List S = copyList(L);
