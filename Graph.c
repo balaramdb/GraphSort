@@ -87,7 +87,7 @@ void visit(Graph G, Graph F, double A[], List S, int x) {
             G->parent[get(G->adj[x])] = x;
             addArc(F, A, x, get(G->adj[x]));
             // printf("Vertex %d has parent %d\n", get(G->adj[x]), x);
-            visit(G, S, get(G->adj[x]));
+            visit(G, F, A, S, get(G->adj[x]));
         }
         moveNext(G->adj[x]);
     }
@@ -230,7 +230,7 @@ void DFS(Graph G, double A[], List S) {
     }
 
     freeGraph(&G);
-    G = copyGraph(F);
+    G = copyGraph(F, A);
 
     clear(S);
     moveFront(L);
@@ -245,25 +245,25 @@ void DFS(Graph G, double A[], List S) {
 
 // other operations -------------------------------------------------
 
-Graph transpose(Graph G) {
-    if (G == NULL) {
-        printf("Graph Error: calling transpose() on NULL Graph reference.\n");
-        exit(1);
-    }
+// Graph transpose(Graph G) {
+//     if (G == NULL) {
+//         printf("Graph Error: calling transpose() on NULL Graph reference.\n");
+//         exit(1);
+//     }
+//
+//     Graph T = newGraph(getOrder(G));
+//     for (int i = 1; i <= getOrder(G); i++) {
+//         moveFront(G->adj[i]);
+//         while (index(G->adj[i]) >= 0) {
+//             addArc(T, get(G->adj[i]), i);
+//             moveNext(G->adj[i]);
+//         }
+//     }
+//
+//     return T;
+// }
 
-    Graph T = newGraph(getOrder(G));
-    for (int i = 1; i <= getOrder(G); i++) {
-        moveFront(G->adj[i]);
-        while (index(G->adj[i]) >= 0) {
-            addArc(T, get(G->adj[i]), i);
-            moveNext(G->adj[i]);
-        }
-    }
-
-    return T;
-}
-
-Graph copyGraph(Graph G) {
+Graph copyGraph(Graph G, double A[]) {
     if (G == NULL) {
         return NULL;
     }
@@ -272,7 +272,7 @@ Graph copyGraph(Graph G) {
     for (int i = 1; i <= getOrder(G); i++) {
         moveFront(G->adj[i]);
         while (index(G->adj[i]) >= 0) {
-            addArc(C, i, get(G->adj[i]));
+            addArc(C, A, i, get(G->adj[i]));
             moveNext(G->adj[i]);
         }
     }

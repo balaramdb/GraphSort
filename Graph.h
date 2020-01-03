@@ -36,12 +36,12 @@ int getParent(Graph G, int u); /* Pre: 1<=u<=n=getOrder(G) */
 int getDiscover(Graph G, int u); /* Pre: 1<=u<=n=getOrder(G) */
 int getFinish(Graph G, int u); /* Pre: 1<=u<=n=getOrder(G) */
 /* Manipulation procedures */
-void addArc(Graph G, int u, int v); /* Pre: 1<=u<=n, 1<=v<=n */
+void addArc(Graph G, double A[], int u, int v); /* Pre: 1<=u<=n, 1<=v<=n */
 // void addEdge(Graph G, int u, int v); /* Pre: 1<=u<=n, 1<=v<=n */
-void DFS(Graph G, List S); /* Pre: length(S)==getOrder(G) */
+void DFS(Graph G, double A[], List S); /* Pre: length(S)==getOrder(G) */
 /* Other Functions */
-Graph transpose(Graph G);
-Graph copyGraph(Graph G);
+// Graph transpose(Graph G);
+Graph copyGraph(Graph G, double A[]);
 void printGraph(FILE* out , Graph G);
 
 
