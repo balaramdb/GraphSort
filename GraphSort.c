@@ -2,8 +2,24 @@
 #include <stdlib.h>
 #include "Graph.h"
 
-Graph makeGraph(double A[]) {
+Graph makeGraph(double A[], int n) {
+    Graph G = newGraph(n);
+    int j;
+    for (int i = 1; i < n; i++) {
+        if (i == n - 1) {
+            j = 1;
+        } else {
+            j = i + 1;
+        }
 
+        if (A[i] < A[j]) {
+            addArc(G, A, i, j);
+        } else if (A[i] > A[j]) {
+            addArc(G, A, j, i);
+        }
+    }
+
+    return G;
 }
 
 void mergeTrees(Graph G, double A[], int x, int y) {
@@ -14,12 +30,9 @@ int merge(Graph G, double A[]) {
 
 }
 
-double* graphSort(double A[]) {
-    // length of array
-    int n = sizeof(A) / sizeof(double);
-
+double* graphSort(double A[], int n) {
     // generate corresponding graph
-    Graph G = makeGraph(A);
+    Graph G = makeGraph(A, n);
 
     // find min and max of A
     int min = 0;
@@ -72,17 +85,18 @@ double* graphSort(double A[]) {
 
 int main() {
     double A[] = {0.5, 5, 2, 10, 7, 8.5, 1.1};
+    int n = sizeof(A) / sizeof(double);
 
     printf("Unsorted A:");
-    for (int i = 0; i < sizeof(A)/sizeof(double); i++) {
+    for (int i = 0; i < n; i++) {
         printf(" %f", A[i]);
     }
     printf("\n");
 
-    double* B = graphSort(A);
+    double* B = graphSort(A, n);
 
     printf("Sorted A:");
-    for (int i = 0; i < sizeof(B)/sizeof(double); i++) {
+    for (int i = 0; i < n; i++) {
         printf(" %f", B[i]);
     }
     printf("\n");
