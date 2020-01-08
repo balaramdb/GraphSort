@@ -20,6 +20,7 @@ int time;
 // struct -----------------------------------------------------------
 
 typedef struct GraphObj {
+    int* instances;
     List* adj;
     int* color;
     int* parent;
@@ -40,6 +41,7 @@ Graph newGraph(int n) {
 
     Graph G = malloc(sizeof(GraphObj));
 
+    G->instances = malloc((n + 1) * sizeof(int));
     G->adj = malloc((n + 1) * sizeof(List));
     G->color = malloc((n + 1) * sizeof(int));
     G->parent = malloc((n + 1) * sizeof(int));
@@ -49,6 +51,7 @@ Graph newGraph(int n) {
     G->size = 0;
 
     for (int x = 0; x <= n; x++) {
+        G->instances[x] = 1;
         G->adj[x] = newList();
         G->parent[x] = NIL;
         G->discover[x] = UNDEF;
@@ -60,6 +63,8 @@ Graph newGraph(int n) {
 
 void freeGraph(Graph* pG) {
     if (pG != NULL && *pG != NULL) {
+        free((*pG)->instances);
+
         for (int x = 0; x <= getOrder(*pG); x++) {
             freeList(&((*pG)->adj[x]));
         }
@@ -78,23 +83,30 @@ void freeGraph(Graph* pG) {
 // private functions -----------------------------------------------
 
 void visit(Graph G, Graph F, double A[], List S, int x) {
+    // printf("visiting vertex %d (%f)\n", x, A[x - 1]);
     G->discover[x] = (++time);
     G->color[x] = GRAY;
 
     moveFront(G->adj[x]);
     while (index(G->adj[x]) >= 0) {
         if (G->color[get(G->adj[x])] == WHITE) {
+            // printf("vertex %d (%f) has parent %d (%f)\n", get(G->adj[x]), A[get(G->adj[x]) - 1], x, A[x - 1]);
             G->parent[get(G->adj[x])] = x;
+            // printf("adding tree edge\n");
             addArc(F, A, x, get(G->adj[x]));
-            // printf("Vertex %d has parent %d\n", get(G->adj[x]), x);
+            // printf("done adding tree edge\n");
+            // int y = get(G->adj[x]);
+            // printf("visiting next vertex: %d (%f)\n", get(G->adj[x]), A[get(G->adj[x]) - 1]);
             visit(G, F, A, S, get(G->adj[x]));
+            // printf("done visiting next vertex\n");
         }
         moveNext(G->adj[x]);
     }
-
+    // printf("done visiting this vetex\n");
     G->color[x] = BLACK;
     G->finish[x] = (++time);
     prepend(S, x);
+    // printf("visit ends\n");
 }
 
 
@@ -118,6 +130,19 @@ int getSize(Graph G) {
     return G->size;
 }
 
+int getInstance(Graph G, int u) {
+    if (G == NULL) {
+        printf("Graph Error: calling getInstance() on NULL Graph reference.\n");
+        exit(1);
+    }
+    if (u < 1 || u > getOrder(G)) {
+        printf("Graph Error: calling getInstance() on incorrect vertex label.\n");
+        exit(1);
+    }
+
+    return G->instances[u];
+}
+
 List getAdj(Graph G, int u) {
     if (G == NULL) {
         printf("Graph Error: calling getAdj() on NULL Graph reference.\n");
@@ -128,7 +153,7 @@ List getAdj(Graph G, int u) {
         exit(1);
     }
 
-    return G->adj[u];
+    return copyList(G->adj[u]);
 }
 
 int getParent(Graph G, int u) {
@@ -173,6 +198,19 @@ int getFinish(Graph G, int u) {
 
 // manipulation procedures ------------------------------------------
 
+void incrementInstance(Graph G, int u) {
+    if (G == NULL) {
+        printf("Graph Error: calling incrementInstance() on NULL Graph reference.\n");
+        exit(1);
+    }
+    if (u < 1 || u > getOrder(G)) {
+        printf("Graph Error: calling incrementInstance() on incorrect vertex label(s).\n");
+        exit(1);
+    }
+
+    G->instances[u]++;
+}
+
 void addArc(Graph G, double A[], int u, int v) {
     if (G == NULL) {
         printf("Graph Error: calling addArc() on NULL Graph reference.\n");
@@ -185,7 +223,11 @@ void addArc(Graph G, double A[], int u, int v) {
 
     moveFront(G->adj[u]);
     while (index(G->adj[u]) >= 0) {
-        if (A[v] < A[get(G->adj[u])]) {
+        if (A[v - 1] < A[get(G->adj[u]) - 1]) {
+            insertBefore(G->adj[u], v);
+            break;
+        }
+        if (A[v - 1] == A[get(G->adj[u]) - 1] && v < get(G->adj[u])) {
             insertBefore(G->adj[u], v);
             break;
         }
@@ -212,16 +254,116 @@ void addArc(Graph G, double A[], int u, int v) {
 //     addArc(G, v, u);
 //     G->size--;
 // }
+//
+// void visit(Graph G, Graph F, double A[], List S, int x) {
+//     printf("visiting vertex %d (%f)\n", x, A[x - 1]);
+//     G->discover[x] = (++time);
+//     G->color[x] = GRAY;
+//
+//     moveFront(G->adj[x]);
+//     while (index(G->adj[x]) >= 0) {
+//         if (G->color[get(G->adj[x])] == WHITE) {
+//             printf("vertex %d (%f) has parent %d (%f)\n", get(G->adj[x]), A[get(G->adj[x]) - 1], x, A[x - 1]);
+//             G->parent[get(G->adj[x])] = x;
+//             printf("adding tree edge\n");
+//             addArc(F, A, x, get(G->adj[x]));
+//             printf("done adding tree edge\n");
+//             // int y = get(G->adj[x]);
+//             printf("visiting next vertex: %d (%f)\n", get(G->adj[x]), A[get(G->adj[x]) - 1]);
+//             visit(G, F, A, S, get(G->adj[x]));
+//             printf("done visiting next vertex\n");
+//         }
+//         moveNext(G->adj[x]);
+//     }
+//     printf("done visiting this vetex\n");
+//     G->color[x] = BLACK;
+//     G->finish[x] = (++time);
+//     prepend(S, x);
+//     printf("visit ends\n");
+// }
+
+void iterVisit(Graph G, Graph F, double A[], List L, int x) {
+    List stack = newList();
+    prepend(stack, x);
+
+    while (length(stack) > 0) {
+        int y = front(stack);
+        deleteFront(stack);
+
+        if (G->color[y] == WHITE) {
+            G->discover[y] = (++time);
+            G->color[y] = GRAY;
+        }
+
+        moveBack(G->adj[y]);
+        while (index(G->adj[y]) >= 0) {
+            if (G->color[get(G->adj[y])] == WHITE) {
+                prepend(stack, get(G->adj[y]));
+            }
+            movePrev(G->adj[y]);
+        }
+    }
+}
+
+void iterDFS(Graph G, double A[], List S) {
+    if (G == NULL) {
+        printf("Graph Error: calling iterDFS() on NULL Graph reference.\n");
+        exit(1);
+    }
+
+    Graph F = newGraph(getOrder(G));
+
+    for (int i = 1; i <= getOrder(G); i++) {
+        G->color[i] = WHITE;
+        G->parent[i] = NIL;
+    }
+
+    time = 0;
+
+    List L = newList();
+
+    moveFront(S);
+    while (index(S) >= 0) {
+        if (G->color[get(S)] == WHITE) {
+            iterVisit(G, F, A, L, get(S));
+        }
+        moveNext(S);
+    }
+
+    // copy dfs tree to G and stack to S
+
+    for (int x = 1; x <= getOrder(G); x++) {
+        clear(G->adj[x]);
+    }
+    G->size = 0;
+
+    for (int i = 1; i <= getOrder(F); i++) {
+        moveFront(F->adj[i]);
+        while (index(F->adj[i]) >= 0) {
+            addArc(G, A, i, get(F->adj[i]));
+            moveNext(F->adj[i]);
+        }
+    }
+
+    clear(S);
+    moveFront(L);
+    while (index(L) >= 0) {
+        append(S, get(L));
+        moveNext(L);
+    }
+
+    freeList(&L);
+}
 
 void DFS(Graph G, double A[], List S) {
     if (G == NULL) {
         printf("Graph Error: calling DFS() on NULL Graph reference.\n");
         exit(1);
     }
-    if (length(S) != getOrder(G)) {
-        printf("Graph Error: calling DFS() on incorrect vertex ordering.\n");
-        exit(1);
-    }
+    // if (length(S) != getOrder(G)) {
+    //     printf("Graph Error: calling DFS() on incorrect vertex ordering.\n");
+    //     exit(1);
+    // }
 
     Graph F = newGraph(getOrder(G));
 
@@ -242,8 +384,21 @@ void DFS(Graph G, double A[], List S) {
         moveNext(S);
     }
 
-    freeGraph(&G);
-    G = copyGraph(F, A);
+    // freeGraph(&G);
+    // G = copyGraph(F, A);
+
+    for (int x = 1; x <= getOrder(G); x++) {
+        clear(G->adj[x]);
+    }
+    G->size = 0;
+
+    for (int i = 1; i <= getOrder(F); i++) {
+        moveFront(F->adj[i]);
+        while (index(F->adj[i]) >= 0) {
+            addArc(G, A, i, get(F->adj[i]));
+            moveNext(F->adj[i]);
+        }
+    }
 
     clear(S);
     moveFront(L);
@@ -293,7 +448,7 @@ Graph copyGraph(Graph G, double A[]) {
     return C;
 }
 
-void printGraph(FILE* out, Graph G) {
+void printGraph(FILE* out, Graph G, double A[]) {
     if (out == NULL) {
         printf("Graph Error: calling addArc() on NULL File reference.\n");
         exit(1);
@@ -304,13 +459,13 @@ void printGraph(FILE* out, Graph G) {
     }
 
     for (int x = 1; x <= getOrder(G); x++) {
-        fprintf(out, "%d: ", x);
+        fprintf(out, "%d (%f): ", x, A[x - 1]);
         moveFront(G->adj[x]);
         while (index(G->adj[x]) >= 0) {
-            fprintf(out, "%d", get(G->adj[x]));
+            fprintf(out, "%d (%f)", get(G->adj[x]), A[get(G->adj[x]) - 1]);
             moveNext(G->adj[x]);
             if (index(G->adj[x]) >= 0) {
-                fprintf(out, " ");
+                fprintf(out, ", ");
             }
         }
         fprintf(out, "\n");

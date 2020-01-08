@@ -521,7 +521,7 @@ List copyList(List L) {
 // printList()
 // Prints to the file pointed to by out, a string representation of L consisting
 // of a space separated sequence of integers, with front on left.
-void printList(FILE* out, List L) {
+void printList(FILE* out, List L, double A[]) {
     if (L == NULL) {
         printf("List Error: calling printList() on NULL List reference\n");
         exit(1);
@@ -533,7 +533,7 @@ void printList(FILE* out, List L) {
 
     Node N = L->front;
     while (N != NULL) { // loop through List
-        fprintf(out, "%d", N->data); // prints to file
+        fprintf(out, "%d (%f)", N->data, A[N->data - 1]); // prints to file
         N = N->next; // iterate
         if (N != NULL) {
             fprintf(out, " ");
